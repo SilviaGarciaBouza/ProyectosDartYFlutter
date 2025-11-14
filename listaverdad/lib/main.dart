@@ -29,11 +29,26 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<String> my = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "1",
+    "2",
+    "3",
+    "4",
+    "1",
+    "2",
+    "3",
+    "4",
+  ];
+  int currentId = 0;
+  String currentNum = "";
 
-  void _incrementCounter() {
+  void eliminar(int index) {
     setState(() {
-      _counter++;
+      my.removeAt(index);
     });
   }
 
@@ -45,16 +60,43 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: ListView.builder(
-        itemCount: 8,
+        itemCount: my.length,
         itemBuilder: (context, index) {
-          return Text("$index");
+          return Dismissible(
+            key: ValueKey(index.toString() + my[index]),
+            direction: DismissDirection.horizontal,
+            background: Container(color: Colors.red),
+            secondaryBackground: Container(color: Colors.blue),
+            onDismissed: (direction) {
+              if (direction == DismissDirection.endToStart) {
+                currentNum = my[index];
+                eliminar(index);
+                currentId = index;
+              } else {
+                currentNum = my[index];
+                eliminar(index);
+                currentId = index;
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("De verdad quieres arquivar esa  tarea?"),
+                  duration: Duration(seconds: 5),
+                  action: SnackBarAction(
+                    label: "deshacer",
+                    onPressed: () => {
+                      setState(() {
+                        my.insert(currentId, currentNum);
+                      }),
+                    },
+                  ),
+                ),
+              );
+            },
+
+            child: Text("${my[index]}"),
+          );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
